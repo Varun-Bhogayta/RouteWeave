@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-from typing import Literal, Optional
+from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator
-
 
 # ── Classifier output ──────────────────────────────────────────
 
@@ -15,7 +14,7 @@ class ClassifierOutput(BaseModel):
 
     task_category: Literal["code", "reasoning", "data", "general"]
     complexity: Literal["low", "medium", "high"]
-    subtask: Optional[str] = None
+    subtask: str | None = None
     estimated_tokens: int = Field(gt=0)
     confidence: float = Field(ge=0.0, le=1.0)
 
@@ -31,7 +30,7 @@ class CostLimit(BaseModel):
     """Cost limits for a tier."""
 
     max_tokens_per_request: int = Field(gt=0)
-    max_usd_per_day: Optional[float] = Field(default=None, gt=0)
+    max_usd_per_day: float | None = Field(default=None, gt=0)
 
 
 class TierConditions(BaseModel):
@@ -93,11 +92,11 @@ class ErrorDetail(BaseModel):
 
     error: str  # machine-readable snake_case key
     message: str  # human-readable explanation
-    classifier_output: Optional[ClassifierOutput] = None
-    available_tiers: Optional[list[str]] = None
-    tier_id: Optional[str] = None
-    daily_limit_usd: Optional[float] = None
-    current_spend_usd: Optional[float] = None
+    classifier_output: ClassifierOutput | None = None
+    available_tiers: list[str] | None = None
+    tier_id: str | None = None
+    daily_limit_usd: float | None = None
+    current_spend_usd: float | None = None
 
 
 # ── OpenAI-compatible request ──────────────────────────────────
@@ -116,9 +115,9 @@ class OpenAIChatRequest(BaseModel):
     model: str  # ignored — router decides
     messages: list[OpenAIMessage]
     stream: bool = False
-    temperature: Optional[float] = None
-    max_tokens: Optional[int] = None
-    user: Optional[str] = None  # can carry user_role here
+    temperature: float | None = None
+    max_tokens: int | None = None
+    user: str | None = None  # can carry user_role here
 
 
 # ── OpenAI-compatible response ─────────────────────────────────

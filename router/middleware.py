@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import logging
 import os
-from typing import Optional
 
 from fastapi import Header
 
@@ -18,7 +17,7 @@ logger = logging.getLogger(__name__)
 # ── Core function ──────────────────────────────────────────────
 
 
-def resolve_user_role(authorization: Optional[str]) -> str:
+def resolve_user_role(authorization: str | None) -> str:
     """Resolve a user role from an Authorization header.
 
     Reads ROLE_MAP from environment (format: "key1:role1,key2:role2"),
@@ -68,7 +67,7 @@ def resolve_user_role(authorization: Optional[str]) -> str:
 # ── FastAPI dependency ─────────────────────────────────────────
 
 
-def get_user_role(authorization: Optional[str] = Header(None)) -> str:
+def get_user_role(authorization: str | None = Header(None)) -> str:
     """FastAPI dependency for resolving user role from Authorization header.
 
     Usage:

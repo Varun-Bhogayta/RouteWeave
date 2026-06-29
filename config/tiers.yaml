@@ -1,10 +1,10 @@
 # RouteWeave Tier Configuration
-# Define your LLM routing tiers here
+# Using locally available Ollama models for end-to-end testing
 
 tiers:
   - id: local-fast
-    label: "Local Fast (Phi-3)"
-    model: phi3:mini
+    label: "Local Fast (Gemma3 1B)"
+    model: gemma3:1b
     provider: ollama
     conditions:
       complexity: [low]
@@ -14,26 +14,26 @@ tiers:
       max_usd_per_day: null
     fallback: null
 
-  - id: mid-cloud
-    label: "Mid Cloud (Gemini Flash)"
-    model: gemini-1.5-flash
-    provider: google
+  - id: local-mid
+    label: "Local Mid (Gemma4 2B)"
+    model: gemma4:e2b
+    provider: ollama
     conditions:
       complexity: [medium]
       category: [code, data, reasoning, general]
     cost_limit:
       max_tokens_per_request: 8000
-      max_usd_per_day: 5.00
+      max_usd_per_day: null
     fallback: null
 
-  - id: premium-cloud
-    label: "Premium (Claude Sonnet)"
-    model: claude-sonnet-4-5
-    provider: anthropic
+  - id: local-premium
+    label: "Local Premium (Gemma4 4B)"
+    model: gemma4:e4b
+    provider: ollama
     conditions:
       complexity: [high]
       category: [code, reasoning, data, general]
     cost_limit:
       max_tokens_per_request: 32000
-      max_usd_per_day: 20.00
+      max_usd_per_day: null
     fallback: null

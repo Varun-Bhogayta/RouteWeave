@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import logging
 import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import redis.asyncio as redis
 
@@ -51,7 +51,7 @@ async def close_redis() -> None:
 
 def _today_str() -> str:
     """Return today's date as YYYY-MM-DD in UTC."""
-    return datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    return datetime.now(UTC).strftime("%Y-%m-%d")
 
 
 def _budget_key(tier_id: str) -> str:

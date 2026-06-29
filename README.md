@@ -2,6 +2,7 @@
 
 > Route LLM prompts to the right model automatically — based on task type, complexity, and cost.
 
+[![CI](https://github.com/Varun-Bhogayta/RouteWeave/actions/workflows/ci.yml/badge.svg)](https://github.com/Varun-Bhogayta/RouteWeave/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 
@@ -169,6 +170,22 @@ Access the web dashboard at: http://localhost:8000/dashboard
 | `GOOGLE_API_KEY` | Google API key | - |
 | `GROQ_API_KEY` | Groq API key | - |
 | `MISTRAL_API_KEY` | Mistral API key | - |
+
+## Python SDK
+
+Use the typed Python client without writing raw HTTP:
+
+```python
+from sdk.client import RouterClient
+
+with RouterClient("http://localhost:8000", api_key="devkey456") as client:
+    result = client.route("Fix the off-by-one in my binary search")
+    print(result.tier_id)        # "local-fast"
+    print(result.response)       # model's answer
+    print(f"{result.latency_ms:.0f}ms")  # "342ms"
+```
+
+See [sdk/README.md](sdk/README.md) for all methods and error handling.
 
 ## Contributing
 
