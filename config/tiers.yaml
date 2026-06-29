@@ -1,0 +1,39 @@
+# RouteWeave Tier Configuration
+# Define your LLM routing tiers here
+
+tiers:
+  - id: local-fast
+    label: "Local Fast (Phi-3)"
+    model: phi3:mini
+    provider: ollama
+    conditions:
+      complexity: [low]
+      category: [code, general, data]
+    cost_limit:
+      max_tokens_per_request: 2000
+      max_usd_per_day: null
+    fallback: null
+
+  - id: mid-cloud
+    label: "Mid Cloud (Gemini Flash)"
+    model: gemini-1.5-flash
+    provider: google
+    conditions:
+      complexity: [medium]
+      category: [code, data, reasoning, general]
+    cost_limit:
+      max_tokens_per_request: 8000
+      max_usd_per_day: 5.00
+    fallback: null
+
+  - id: premium-cloud
+    label: "Premium (Claude Sonnet)"
+    model: claude-sonnet-4-5
+    provider: anthropic
+    conditions:
+      complexity: [high]
+      category: [code, reasoning, data, general]
+    cost_limit:
+      max_tokens_per_request: 32000
+      max_usd_per_day: 20.00
+    fallback: null

@@ -1,0 +1,81 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RouteWeave Tier Configuration",
+  "description": "Schema for validating tier configuration files",
+  "type": "object",
+  "required": ["tiers"],
+  "properties": {
+    "tiers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "model", "provider", "conditions", "cost_limit"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+$",
+            "description": "Unique tier identifier (slug format)"
+          },
+          "label": {
+            "type": "string",
+            "description": "Human-readable tier name"
+          },
+          "model": {
+            "type": "string",
+            "description": "Model identifier for the LLM provider"
+          },
+          "provider": {
+            "type": "string",
+            "enum": ["ollama", "openai", "anthropic", "google", "groq", "mistral"],
+            "description": "LLM provider name"
+          },
+          "conditions": {
+            "type": "object",
+            "required": ["complexity", "category"],
+            "properties": {
+              "complexity": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "enum": ["low", "medium", "high"]
+                },
+                "description": "Complexity levels this tier handles"
+              },
+              "category": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "enum": ["code", "reasoning", "data", "general"]
+                },
+                "description": "Task categories this tier handles"
+              }
+            }
+          },
+          "cost_limit": {
+            "type": "object",
+            "required": ["max_tokens_per_request"],
+            "properties": {
+              "max_tokens_per_request": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Maximum tokens per request"
+              },
+              "max_usd_per_day": {
+                "type": ["number", "null"],
+                "minimum": 0.01,
+                "description": "Daily USD spending limit (null for unlimited)"
+              }
+            }
+          },
+          "fallback": {
+            "type": "null",
+            "description": "Always null - fail fast by design"
+          }
+        }
+      }
+    }
+  }
+}
