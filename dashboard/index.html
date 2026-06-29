@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="RouteWeave Dashboard — Manage LLM routing tiers, monitor budgets, and test prompts">
+    <title>RouteWeave Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-brand">
+                <h1>RouteWeave</h1>
+                <span class="header-subtitle">Intelligent LLM Router</span>
+            </div>
+            <nav class="header-nav">
+                <button class="nav-btn active" data-view="tiers" id="nav-tiers">Tiers</button>
+                <button class="nav-btn" data-view="budget" id="nav-budget">Budget</button>
+                <button class="nav-btn" data-view="test" id="nav-test">Test Prompt</button>
+            </nav>
+            <div class="header-status">
+                <span class="status-dot" id="health-dot"></span>
+                <span class="status-text" id="health-text">Checking...</span>
+            </div>
+        </header>
+
+        <!-- Tier List View -->
+        <main class="view active" id="view-tiers">
+            <div class="view-header">
+                <h2>Configured Tiers</h2>
+                <button class="btn btn-primary" id="btn-add-tier">+ Add Tier</button>
+            </div>
+            <div class="tier-grid" id="tier-grid">
+                <!-- Tier cards rendered by JS -->
+            </div>
+        </main>
+
+        <!-- Edit Form View -->
+        <main class="view" id="view-edit">
+            <div class="view-header">
+                <h2 id="edit-title">Add New Tier</h2>
+                <button class="btn btn-ghost" id="btn-cancel-edit">← Back</button>
+            </div>
+            <form class="tier-form" id="tier-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="field-id">ID</label>
+                        <input type="text" id="field-id" name="id" pattern="^[a-z0-9-]+$" required
+                            placeholder="e.g. local-fast">
+                        <span class="form-hint">Lowercase, numbers, hyphens only</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="field-label">Label</label>
+                        <input type="text" id="field-label" name="label" required
+                            placeholder="e.g. Local Fast (Phi-3)">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="field-model">Model</label>
+                        <input type="text" id="field-model" name="model" required
+                            placeholder="e.g. phi3:mini">
+                    </div>
+                    <div class="form-group">
+                        <label for="field-provider">Provider</label>
+                        <select id="field-provider" name="provider" required>
+                            <option value="ollama">Ollama</option>
+                            <option value="openai">OpenAI</option>
+                            <option value="anthropic">Anthropic</option>
+                            <option value="google">Google</option>
+                            <option value="groq">Groq</option>
+                            <option value="mistral">Mistral</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Complexity</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox"><input type="checkbox" name="complexity" value="low"> Low</label>
+                            <label class="checkbox"><input type="checkbox" name="complexity" value="medium"> Medium</label>
+                            <label class="checkbox"><input type="checkbox" name="complexity" value="high"> High</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox"><input type="checkbox" name="category" value="code"> Code</label>
+                            <label class="checkbox"><input type="checkbox" name="category" value="reasoning"> Reasoning</label>
+                            <label class="checkbox"><input type="checkbox" name="category" value="data"> Data</label>
+                            <label class="checkbox"><input type="checkbox" name="category" value="general"> General</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="field-max-tokens">Token Cap</label>
+                        <input type="number" id="field-max-tokens" name="max_tokens_per_request" min="1" required
+                            placeholder="e.g. 2000">
+                    </div>
+                    <div class="form-group">
+                        <label for="field-max-usd">Daily USD Cap</label>
+                        <input type="number" id="field-max-usd" name="max_usd_per_day" min="0.01" step="0.01"
+                            placeholder="unlimited">
+                        <span class="form-hint">Leave empty for unlimited</span>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary" id="btn-save-tier">Save Tier</button>
+                    <button type="button" class="btn btn-ghost" id="btn-cancel-form">Cancel</button>
+                </div>
+                <div class="form-error" id="form-error"></div>
+            </form>
+        </main>
+
+        <!-- Budget View -->
+        <main class="view" id="view-budget">
+            <div class="view-header">
+                <h2>Daily Budget</h2>
+                <div class="view-header-actions">
+                    <span class="budget-date" id="budget-date"></span>
+                    <button class="btn btn-ghost" id="btn-refresh-budget">↻ Refresh</button>
+                </div>
+            </div>
+            <div class="budget-table-wrap">
+                <table class="budget-table" id="budget-table">
+                    <thead>
+                        <tr>
+                            <th>Tier ID</th>
+                            <th>Daily Cap</th>
+                            <th>Spent Today</th>
+                            <th>Usage</th>
+                        </tr>
+                    </thead>
+                    <tbody id="budget-tbody">
+                        <!-- Rows rendered by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
+
+        <!-- Test Prompt View -->
+        <main class="view" id="view-test">
+            <div class="view-header">
+                <h2>Test Prompt</h2>
+            </div>
+            <div class="test-form">
+                <div class="form-group">
+                    <label for="test-prompt">Prompt</label>
+                    <textarea id="test-prompt" rows="4" placeholder="Enter a test prompt..."></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="test-role">User Role</label>
+                        <select id="test-role">
+                            <option value="default">default</option>
+                            <option value="developer">developer</option>
+                            <option value="admin">admin</option>
+                        </select>
+                    </div>
+                    <div class="form-group form-group-btn">
+                        <button class="btn btn-primary" id="btn-send-test">Send →</button>
+                    </div>
+                </div>
+            </div>
+            <div class="test-result" id="test-result" style="display: none;">
+                <!-- Result rendered by JS -->
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
