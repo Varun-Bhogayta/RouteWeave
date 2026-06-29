@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 CLASSIFIER_MODEL: str = os.getenv("CLASSIFIER_MODEL", "phi3:mini")
 LLAMA_CPP_URL: str = os.getenv("LLAMA_CPP_URL", "http://localhost:8080")
-CLASSIFIER_TIMEOUT_SEC: int = 15
+CLASSIFIER_TIMEOUT_SEC: int = int(os.getenv("CLASSIFIER_TIMEOUT_SEC", "60"))
 
 # ── System prompt ──────────────────────────────────────────────
 
@@ -88,7 +88,7 @@ async def classify_prompt(request: PromptRequest) -> ClassifierOutput:
             an HTTP error occurs, or the request times out.
     """
     messages = [{"role": "system", "content": SYSTEM_PROMPT}]
-    
+
     # Build context from last 3 conversation history turns
     if request.conversation_history:
         recent = request.conversation_history[-3:]

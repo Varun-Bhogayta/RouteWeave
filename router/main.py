@@ -9,16 +9,15 @@ from __future__ import annotations
 import logging
 import os
 import time
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
+from datetime import UTC
 
-from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from models.schemas import (
-    ClassifierOutput,
     ErrorDetail,
     OpenAIChatRequest,
     OpenAIChatResponse,
@@ -90,7 +89,10 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     if redis_ok:
         logger.info("Redis connected at %s", budget_tracker.REDIS_URL)
     else:
-        logger.warning("Redis not available at %s — budget tracking disabled", budget_tracker.REDIS_URL)
+        logger.warning(
+            "Redis not available at %s — budget tracking disabled",
+            budget_tracker.REDIS_URL,
+        )
 
     yield
 
@@ -282,7 +284,10 @@ async def openai_chat_completions(
     try:
         classifier_output = await classify_prompt(internal_request)
     except ClassifierError as e:
-        raise HTTPException(status_code=422, detail={"error": "classifier_error", "message": str(e)})
+        raise HTTPException(
+            status_code=422,
+            detail={"error": "classifier_error", "message": str(e)},
+        )
 
     # Step 2 — Select tier
     budget_state: dict[str, float] = {}
@@ -406,7 +411,10 @@ async def create_tier(tier: TierConfig) -> dict:
         if existing.id == tier.id:
             raise HTTPException(
                 status_code=409,
-                detail={"error": "duplicate_tier_id", "message": f"Tier id '{tier.id}' already exists"},
+                detail={
+                    "error": "duplicate_tier_id",
+                    "message": f"Tier id '{tier.id}' already exists",
+                },
             )
 
     # Check ambiguous conditions
@@ -547,9 +555,9 @@ async def get_budget() -> dict:
     Returns:
         Dict with date and per-tier spend data.
     """
-    from datetime import datetime, timezone
+    from datetime import datetime
 
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    today = datetime.now(UTC).strftime("%Y-%m-%d")
     tier_spend = await budget_tracker.get_all_today()
 
     return {

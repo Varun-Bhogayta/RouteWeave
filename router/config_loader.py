@@ -56,22 +56,22 @@ def load_tiers(config_path: str) -> list[TierConfig]:
 
 def _load_yaml(path: Path) -> list[TierConfig]:
     """Load tiers from a YAML file."""
-    with open(path, "r") as f:
+    with open(path) as f:
         data = yaml.safe_load(f)
 
     if not data or "tiers" not in data:
-        raise ValueError(f"Config file must contain a 'tiers' key")
+        raise ValueError("Config file must contain a 'tiers' key")
 
     return _parse_tiers(data["tiers"])
 
 
 def _load_json(path: Path) -> list[TierConfig]:
     """Load tiers from a JSON file."""
-    with open(path, "r") as f:
+    with open(path) as f:
         data = json.load(f)
 
     if not data or "tiers" not in data:
-        raise ValueError(f"Config file must contain a 'tiers' key")
+        raise ValueError("Config file must contain a 'tiers' key")
 
     return _parse_tiers(data["tiers"])
 

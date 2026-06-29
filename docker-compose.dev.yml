@@ -1,0 +1,16 @@
+# Dev override — hot-reload + source mount
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  router:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: uvicorn router.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ./router:/app/router       # live-reload router code
+      - ./models:/app/models       # live-reload schemas
+      - ./dashboard:/app/dashboard # live-reload dashboard assets
+      - ./config:/app/config       # tier edits persist
+    environment:
+      LOG_LEVEL: DEBUG

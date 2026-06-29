@@ -1,0 +1,68 @@
+# 5-tier example config: covers all complexity × category combinations
+# with a progression from local → cloud → premium.
+
+tiers:
+  # ── Tier 1: Local model for trivial tasks ──────────────────────
+  - id: local-trivial
+    label: "Local Trivial (Phi-3 Mini)"
+    model: phi3:mini
+    provider: ollama
+    conditions:
+      complexity: [low]
+      category: [general, data]
+    cost_limit:
+      max_tokens_per_request: 1000
+      max_usd_per_day: null     # free — local inference
+    fallback: null
+
+  # ── Tier 2: Local model for low-complexity code ─────────────────
+  - id: local-code
+    label: "Local Code (CodeLlama)"
+    model: codellama:7b
+    provider: ollama
+    conditions:
+      complexity: [low]
+      category: [code]
+    cost_limit:
+      max_tokens_per_request: 2000
+      max_usd_per_day: null
+    fallback: null
+
+  # ── Tier 3: Fast cloud for medium tasks ──────────────────────────
+  - id: groq-medium
+    label: "Groq Medium (Mixtral)"
+    model: mixtral-8x7b-32768
+    provider: groq
+    conditions:
+      complexity: [medium]
+      category: [code, data, general, reasoning]
+    cost_limit:
+      max_tokens_per_request: 8000
+      max_usd_per_day: 3.00
+    fallback: null
+
+  # ── Tier 4: Premium cloud for high-complexity code/data ─────────
+  - id: openai-premium
+    label: "OpenAI Premium (GPT-4o)"
+    model: gpt-4o
+    provider: openai
+    conditions:
+      complexity: [high]
+      category: [code, data]
+    cost_limit:
+      max_tokens_per_request: 16000
+      max_usd_per_day: 15.00
+    fallback: null
+
+  # ── Tier 5: Top-tier reasoning ───────────────────────────────────
+  - id: claude-reasoning
+    label: "Claude Sonnet (Reasoning)"
+    model: claude-sonnet-4-5
+    provider: anthropic
+    conditions:
+      complexity: [high]
+      category: [reasoning, general]
+    cost_limit:
+      max_tokens_per_request: 32000
+      max_usd_per_day: 20.00
+    fallback: null
